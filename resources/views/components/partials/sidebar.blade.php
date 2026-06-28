@@ -144,6 +144,11 @@
                 <i class="fas fa-stethoscope w-4 text-center"></i>
                 Periksa Pasien
             </a>
+            <a href="{{ route('dokter.riwayat-pasien.index') }}" 
+                class="{{ $baseLink }} {{ request()->routeIs('dokter.riwayat-pasien.*') ? $active : $inactive }}">
+                <i class="fas fa-clock-rotate-left w-4 text-center"></i>
+                Riwayat Pasien
+            </a>
 
         </div>
         @endif

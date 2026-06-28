@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\PoliController;
 use App\Http\Controllers\Admin\ObatController;
 use App\Http\Controllers\Dokter\JadwalPeriksaController;
 use App\Http\Controllers\Dokter\PeriksaController as DokterPeriksaController;
+// Tambahkan baris ini untuk memanggil RiwayatPasienController
+use App\Http\Controllers\Dokter\RiwayatPasienController;
 use App\Http\Controllers\Pasien\PoliController as PasienPoliController;
 use App\Http\Controllers\Pasien\RiwayatController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +23,7 @@ Route::get('/register', [AuthController::class, 'showRegister']);
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Rute untuk Admin
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
@@ -31,16 +34,26 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::resource('obat', ObatController::class);
 });
 
+// Rute untuk Dokter
 Route::middleware(['auth', 'role:dokter'])->prefix('dokter')->group(function () {
     Route::get('/dashboard', function () {
         return view('dokter.dashboard');
     })->name('dokter.dashboard');
+
+    // CRUD Jadwal Periksa
     Route::resource('jadwal-periksa', JadwalPeriksaController::class);
+
+    // Rute Periksa Pasien
     Route::get('/periksa', [DokterPeriksaController::class, 'index'])->name('dokter.periksa.index');
     Route::get('/periksa/{id}', [DokterPeriksaController::class, 'create'])->name('dokter.periksa.create');
     Route::post('/periksa/{id}', [DokterPeriksaController::class, 'store'])->name('dokter.periksa.store');
+
+    // ✅ Rute Riwayat Pemeriksaan Pasien
+    Route::get('/riwayat-pasien', [RiwayatPasienController::class, 'index'])->name('dokter.riwayat-pasien.index');
+    Route::get('/riwayat-pasien/{id}', [RiwayatPasienController::class, 'show'])->name('dokter.riwayat-pasien.show');
 });
 
+// Rute untuk Pasien
 Route::middleware(['auth', 'role:pasien'])->prefix('pasien')->group(function () {
     Route::get('/dashboard', function () {
         return view('pasien.dashboard');

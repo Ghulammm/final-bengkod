@@ -126,6 +126,22 @@
                         @enderror
                     </div>
 
+                    {{-- Harga Jasa Pemeriksaan --}}
+                    <div class="card bg-base-100 shadow-md rounded-2xl border p-6">
+                        <h3 class="font-bold text-slate-700 mb-4 text-sm uppercase tracking-wider">Harga Jasa Pemeriksaan</h3>
+                        <div class="flex items-center border-2 border-slate-200 rounded-xl px-4 py-3 focus-within:border-primary">
+                            <span class="text-slate-500 font-semibold text-sm mr-2">Rp</span>
+                            <input type="number" id="biayaJasaInput"
+                                value="150000"
+                                min="0" step="1000"
+                                class="w-full focus:outline-none text-slate-800 font-bold text-lg" required>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-2">
+                            <i class="fas fa-circle-info"></i>
+                            Isi biaya jasa dokter terlebih dahulu sebelum memilih obat.
+                        </p>
+                    </div>
+
                     {{-- Pilih Obat --}}
                     <div class="card bg-base-100 shadow-md rounded-2xl border p-6">
                         <h3 class="font-bold text-slate-700 mb-4 text-sm uppercase tracking-wider">
@@ -156,19 +172,16 @@
                         @endif
                     </div>
 
-                    {{-- Biaya Periksa --}}
-                    <div class="card bg-base-100 shadow-md rounded-2xl border p-6">
-                        <h3 class="font-bold text-slate-700 mb-4 text-sm uppercase tracking-wider">Total Biaya Periksa</h3>
-                        <div class="flex items-center border-2 border-slate-200 rounded-xl px-4 py-3 focus-within:border-primary">
-                            <span class="text-slate-500 font-semibold text-sm mr-2">Rp</span>
-                            <input type="number" name="biaya_periksa" id="biayaInput"
-                                value="{{ old('biaya_periksa', 50000) }}"
-                                min="0" step="1000"
-                                class="w-full focus:outline-none text-slate-800 font-bold text-lg" required>
+                    {{-- Total Biaya Periksa --}}
+                    <div class="card bg-base-100 shadow-md rounded-2xl border p-6 bg-slate-50">
+                        <h3 class="font-bold text-slate-700 mb-2 text-sm uppercase tracking-wider">Total Biaya Periksa</h3>
+                        <div class="text-3xl font-black text-[#2d4499]">
+                            Rp <span id="totalBiayaDisplay">150.000</span>
                         </div>
+                        <input type="hidden" name="biaya_periksa" id="biayaInput" value="150000">
                         <p class="text-xs text-slate-400 mt-2">
-                            <i class="fas fa-circle-info"></i>
-                            Biaya dihitung otomatis dari obat yang dipilih + biaya jasa Rp 50.000. Bisa diubah manual.
+                            <i class="fas fa-calculator mr-1"></i>
+                            Dihitung otomatis: Jasa Pemeriksaan + Total Harga Obat
                         </p>
                         @error('biaya_periksa')
                             <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
@@ -195,21 +208,29 @@
 
     @push('scripts')
     <script>
-        const BASE_BIAYA = 50000;
+        const biayaJasaInput = document.getElementById('biayaJasaInput');
         const biayaInput = document.getElementById('biayaInput');
+        const totalBiayaDisplay = document.getElementById('totalBiayaDisplay');
         const checks = document.querySelectorAll('.obat-check');
 
         function hitungBiaya() {
-            let total = BASE_BIAYA;
+            let jasa = parseInt(biayaJasaInput.value) || 0;
+            let totalObat = 0;
             checks.forEach(cb => {
                 if (cb.checked) {
-                    total += parseInt(cb.closest('.obat-item').dataset.harga) || 0;
+                    totalObat += parseInt(cb.closest('.obat-item').dataset.harga) || 0;
                 }
             });
-            biayaInput.value = total;
+            let grandTotal = jasa + totalObat;
+            biayaInput.value = grandTotal;
+            totalBiayaDisplay.textContent = new Intl.NumberFormat('id-ID').format(grandTotal);
         }
 
+        biayaJasaInput.addEventListener('input', hitungBiaya);
         checks.forEach(cb => cb.addEventListener('change', hitungBiaya));
+        
+        // Hitung awal saat load halaman
+        hitungBiaya();
     </script>
     @endpush
 

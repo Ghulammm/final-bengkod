@@ -29,7 +29,7 @@ class PeriksaController extends Controller
     public function create($id)
     {
         $daftarPoli = DaftarPoli::with(['pasien', 'jadwalPeriksa'])->findOrFail($id);
-        $obats      = Obat::orderBy('nama_obat')->get();
+        $obats      = Obat::where('stok', '>', 0)->orderBy('nama_obat')->get();
 
         return view('dokter.periksa.create', compact('daftarPoli', 'obats'));
     }
@@ -63,6 +63,12 @@ class PeriksaController extends Controller
                     'id_periksa' => $periksa->id,
                     'id_obat'    => $idObat,
                 ]);
+
+                // Kurangi stok obat otomatis
+                $obat = Obat::find($idObat);
+                if ($obat && $obat->stok > 0) {
+                    $obat->decrement('stok');
+                }
             }
         }
 
